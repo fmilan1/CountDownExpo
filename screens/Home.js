@@ -16,17 +16,24 @@ const HomeScreen = ({ navigation, route }) => {
   const [events, setEvent] = useState(0);
 
   
-  const handleDelete = (id) => {
-    // setEventList();
-    // console.log(id);
-    // route.params.events = (route.params.events).filter((event) => event.props.id !== id);
+  const handleDelete = (created) => {
+    setEventList((prevlist) => prevlist.filter((event) => event.props.created !== created));
   }
   
+
+  React.useEffect(() => {
+    const focus = navigation.addListener('focus', () => {
+      const {newEvent} = route.params;
+      if (newEvent !== null) {
+        const createdDate = Date.now();
+        setEventList([...eventList, <Event onDelete={handleDelete} color={newEvent.color} key={createdDate} created={createdDate} />])
+        route.params = {newEvent: null}
+      }
+    })
+    return focus;
+  })
   
   useFocusEffect(() => {
-    console.log(route.params.events.length);
-    // if ((route.params.events).length == 0) return
-    // console.log('hahaha     ', route.params.events[0].props);
     
   })
 
@@ -35,16 +42,12 @@ const HomeScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <StatusBar style='auto' />
       <ScrollView>
-        {route.params.events}
+        {eventList}
       </ScrollView>
       
       <TouchableOpacity style={{width: 50, height: 50, backgroundColor: 'white', elevation: 5, position: 'absolute', bottom: 20, right: 20, borderRadius: 25, justifyContent: 'center', alignItems: 'center'}} 
         onPress={() => { 
-          navigation.navigate('New Event', {
-            events: route.params.events,
-            onDelete: handleDelete,
-            newEventId: events
-          });
+          navigation.navigate('New Event');
           
       }}>
         <Text style={{fontSize: 30}}>+</Text>

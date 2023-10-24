@@ -34,7 +34,7 @@ function App() {
     // </View>
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name='Home' component={HomeScreen} initialParams={{events: []}} />
+        <Stack.Screen name='Home' component={HomeScreen} initialParams={{newEvent: null}} />
         <Stack.Screen name='New Event' component={NewEvent} />
       </Stack.Navigator>
     </NavigationContainer>

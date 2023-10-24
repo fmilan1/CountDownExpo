@@ -126,7 +126,7 @@ export default Event = (props) => {
 
     React.useEffect(() => {
         if (canDelete)
-            props.onDelete(props.id);
+            props.onDelete(props.created);
     }, [canDelete])
     
     

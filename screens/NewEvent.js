@@ -10,8 +10,8 @@ const NewEvent = ({ navigation, route }) => {
   
   return (
     <View>
-      {console.log(route.params)}
-      <TouchableOpacity onPress={() => navigation.navigate('Home', {events: [...route.params.events, <Event color='cadetblue' key={route.params.newEventId} id={route.params.newEventId} onDelete={route.params.onDelete} />]})}>
+      {/* {console.log(route.params)} */}
+      <TouchableOpacity onPress={() => navigation.navigate('Home', { newEvent: { color: 'red' } } )}>
         <Text>New</Text>
       </TouchableOpacity>
 
@@ -27,8 +27,5 @@ export default NewEvent;
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: 'cadetblue'
-    // flex: 1,
-    // backgroundColor: 'red',
   },
 });
