@@ -25,7 +25,6 @@ const HomeScreen = ({ navigation, route }) => {
     const focus = navigation.addListener('focus', () => {
       const {newEvent} = route.params;
       if (newEvent !== null) {
-        console.log(newEvent.color);
         const createdDate = Date.now();
         setEventList([...eventList, <Event onDelete={handleDelete} color={newEvent.color} key={createdDate} created={createdDate} date={newEvent.date} title={newEvent.title}/>])
         route.params = {newEvent: null}
