@@ -11,7 +11,6 @@ import {
     SectionListComponent
 } from 'react-native';
 
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 // import CountDown from 'react-native-countdown-component';
 
@@ -23,7 +22,6 @@ import {AsyncStorage, useAsyncStorage} from '@react-native-async-storage/async-s
 
 import Animated, { interpolate, runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ColorPicker, { Panel1, Swatches, Preview, OpacitySlider, HueSlider, PreviewText } from 'reanimated-color-picker';
-import { StatusBar } from 'expo-status-bar';
 import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
@@ -40,7 +38,7 @@ export default Event = (props) => {
     const [showColorPicker, setColorPickerShow] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
-    const [title, setName] = useState('Title');
+    const [title, setName] = useState(props.title);
 
     const [color, setColor] = useState(props.color);
     const [lastColor, setLastColor] = useState(props.color);
@@ -133,11 +131,8 @@ export default Event = (props) => {
     return (
         <GestureHandlerRootView>
             <GestureDetector gesture={swipeGesture}>
-
                 <View>
-
                     <Animated.View style={[styles.eventContainer, animatedStyle]}>
-                        <StatusBar backgroundColor='transparent' />
                         <View style={styles.header}>
 
                             <Text>
@@ -171,20 +166,10 @@ export default Event = (props) => {
                         </View>
                         
                         
-                            {/* <DateTimePickerModal 
-                                isVisible={showDatePicker}
-                                date={date} 
-                                onConfirm={(selectedDate) => { 
-                                    const currentDate = selectedDate || date;
-                                    setDate(currentDate);
-                                    setDatePickerShow(false);
-                                }}
-                                onCancel={() => setDatePickerShow(false)}
-                            /> */}
+                            
                         
 
-                        <Modal visible={showColorPicker} animationType='slide' transparent={true}>
-                            <StatusBar translucent={true} backgroundColor='transparent'/>
+                        <Modal visible={showColorPicker} animationType='slide' statusBarTranslucent={true} >
                             <View style={{alignItems: 'center', backgroundColor: color, flex: 1, justifyContent: 'center'}}>
                                 <View style={{backgroundColor: 'white', width: '70%', padding: 20, borderRadius: 25, alignItems: 'center', elevation: 5}}>
 
