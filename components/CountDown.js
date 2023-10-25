@@ -4,16 +4,11 @@ import {
     Text, View, StyleSheet
 } from 'react-native'
 
+const CountDown = ({until, color}) => {
 
-interface Props {
-    until?: number;
-    color?: string;
-}
-
-const CountDown = (props: Props) => {
     const calculateTimeLeft = () => {
         const now = new Date(Date.now()).getTime();
-        const targetTime = props.until;
+        const targetTime = until;
         const timeRemaining = targetTime - now;
     
         if (timeRemaining <= 0) {
@@ -36,7 +31,7 @@ const CountDown = (props: Props) => {
         }, 1000);
     
         return () => clearInterval(timer);
-      }, []);
+      });
       
     return (
         <View style={styles.cardcontainer}>
@@ -44,25 +39,25 @@ const CountDown = (props: Props) => {
                 style={styles.card}
             >
                 <Text style={styles.text}>{timeLeft.days}</Text>
-                <Text style={[styles.placeholder, {backgroundColor: props.color}]}>D</Text>
+                <Text style={[styles.placeholder, {backgroundColor: color}]}>D</Text>
             </View>
             <View
                 style={styles.card}
             >
                 <Text style={styles.text}>{timeLeft.hours}</Text>
-                <Text style={[styles.placeholder, {backgroundColor: props.color}]}>H</Text>
+                <Text style={[styles.placeholder, {backgroundColor: color}]}>H</Text>
             </View>
             <View
                 style={styles.card}
             >
                 <Text style={styles.text}>{timeLeft.minutes}</Text>
-                <Text style={[styles.placeholder, {backgroundColor: props.color}]}>M</Text>
+                <Text style={[styles.placeholder, {backgroundColor: color}]}>M</Text>
             </View>
             <View
                 style={styles.card}
             >
                 <Text style={styles.text}>{timeLeft.seconds}</Text>
-                <Text style={[styles.placeholder, {backgroundColor: props.color}]}>S</Text>
+                <Text style={[styles.placeholder, {backgroundColor: color}]}>S</Text>
             </View>
         </View>
     );

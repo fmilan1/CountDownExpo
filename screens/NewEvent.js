@@ -8,17 +8,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 
 
-const NewEvent = ({ navigation }) => {
+const NewEvent = ({ navigation, route }) => {
 
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [timeModalVisible, setTimeModalVisible] = useState(false);
   const [colorPickerModalVisible, setColorPickerModalVisible] = useState(false);
 
   const now = new Date(Date.now());
-  const [date, setDate] = useState(new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1));
-  const [title, setTitle] = useState('');
-  const [color, setColor] = useState('cadetblue');
-  const [lastColor, setLastColor] = useState('cadetblue');
+  const [date, setDate] = useState(route.params.date ? new Date(route.params.date) : new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1));
+  const [title, setTitle] = useState(route.params.title);
+  const [color, setColor] = useState(route.params.color ? route.params.color : 'cadetblue');
+  const [lastColor, setLastColor] = useState(color);
 
   const onChangeText = (text) => {
     setTitle(text);
@@ -44,6 +44,7 @@ const NewEvent = ({ navigation }) => {
             style={styles.textinput}
             placeholder='Title of event'
             onChangeText={onChangeText}
+            value={title}
           />
         </View>
 
@@ -79,10 +80,14 @@ const NewEvent = ({ navigation }) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate('Home', { newEvent: { color: color, date: date.getTime(), title: title } })}
+          onPress={() => {
+            route.params.newEvent == 'edit' ? 
+            navigation.navigate('Home', { newEvent: 'edit', color: color, date: date.getTime(), title: title, created: route.params.created  }) :
+            navigation.navigate('Home', { newEvent: { color: color, date: date.getTime(), title: title } });
+          }}
           style={[styles.button, { width: 70 }]}
         >
-          <Text style={styles.buttonText}>Create</Text>
+          <Text style={styles.buttonText}>{route.params.newEvent == 'edit' ? 'Update' : 'Create'}</Text>
         </TouchableOpacity>
       </View>
 

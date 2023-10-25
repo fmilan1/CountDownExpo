@@ -12,29 +12,21 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faAngleDown, faPalette, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
-import Animated, { interpolate, runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, runOnJS, runOnUI, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ColorPicker, { Panel1, Swatches, Preview, OpacitySlider, HueSlider, PreviewText } from 'reanimated-color-picker';
 import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import CountDown from './CountDown';
+import { useNavigation } from '@react-navigation/native';
+import { FlatList } from 'react-native';
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const OFFSET = SCREEN_WIDTH * 0.2;
 
-export default Event = (props) => {
+export default Event = ({color, onDelete, title, created, date}) => {
 
-
-    const [date, setDate] = useState(props.date);
-    const [showDatePicker, setDatePickerShow] = useState(false);
-    const [showColorPicker, setColorPickerShow] = useState(false);
-    const [expanded, setExpanded] = useState(false);
-
-    const [title, setName] = useState(props.title);
-
-    const [color, setColor] = useState(props.color);
-    const [lastColor, setLastColor] = useState(props.color);
-
+    const navigation = useNavigation();
 
     const opacity = useSharedValue(0);
     const swipeGesture = Gesture.Pan();
@@ -47,7 +39,6 @@ export default Event = (props) => {
         transform: [{ translateX: translateX.value }],
         height: heightValue.value,
         backgroundColor: color,
-        marginTop: margin.value,
     }))
 
     swipeGesture.onBegin((e) => {
@@ -55,15 +46,11 @@ export default Event = (props) => {
     });
 
     swipeGesture.onUpdate((e) => {
-        if (expanded) return;
         translateX.value = startTranslationX + e.translationX;
         opacity.value = interpolate(-translateX.value, [0, OFFSET], [0, 1])
     });
 
     swipeGesture.onEnd((e) => {
-
-
-
         if (-translateX.value < OFFSET)
             translateX.value = withSpring(0);
         else
@@ -73,26 +60,6 @@ export default Event = (props) => {
             handleDelete();
         }
     });
-
-
-
-
-
-
-
-
-    React.useEffect(() => {
-        heightValue.value = withTiming(expanded ? 300 : 100);
-    }, [expanded])
-
-
-    onColorChange = (newColor) => {
-        setColor(newColor.hex);
-    }
-
-    onColorChangeComplete = (newColor) => {
-        setLastColor(newColor.hex);
-    }
 
 
     const [canDelete, setCanDelete] = useState(false);
@@ -109,95 +76,47 @@ export default Event = (props) => {
         translateX.value = withTiming(-SCREEN_WIDTH, { duration: 300 }, (finished) => {
             if (finished)
                 runOnJS(doDelete)();
-
         });
-
     }
 
     React.useEffect(() => {
         if (canDelete)
-            props.onDelete(props.created);
+            onDelete(created);
     }, [canDelete])
-
 
     return (
         <GestureHandlerRootView>
             <GestureDetector gesture={swipeGesture}>
-                <View>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('New Event', {newEvent: 'edit', created: created, date: date, color: color, title: title})}
+                >
                     <Animated.View style={[styles.eventContainer, animatedStyle]}>
-                        <View style={styles.header}>
-
-                            <Text>
+                        <View style={{width: 0, flex: 1, flexGrow: 1}}>
+                            <Text style={styles.text}>
                                 {title}
                             </Text>
-
-                            <CountDown
-                                until={date}
-                                color={color}
-                            />
-                            <TouchableOpacity
-                                onPress={() => { setExpanded(!expanded); }}
-                                style={styles.button}
-                            >
-                                <FontAwesomeIcon icon={faAngleDown} />
-                            </TouchableOpacity>
                         </View>
 
-                        <View style={styles.settingsContainer}>
-                            <View style={styles.row}>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => { setColorPickerShow(true) }}
-                                >
-                                    <FontAwesomeIcon icon={faPalette} />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-
-
-
-
-
-                        <Modal visible={showColorPicker} animationType='slide' statusBarTranslucent={true} >
-                            <View style={{ alignItems: 'center', backgroundColor: color, flex: 1, justifyContent: 'center' }}>
-                                <View style={{ backgroundColor: 'white', width: '70%', padding: 20, borderRadius: 25, alignItems: 'center', elevation: 5 }}>
-
-                                    <ColorPicker style={{ width: '100%' }} value={lastColor} onChange={onColorChange} onComplete={onColorChangeComplete}>
-                                        <Panel1 style={{ borderRadius: 13, marginBottom: 20 }} />
-                                        <HueSlider style={{ borderRadius: 20, marginBottom: 20 }} />
-                                        <PreviewText style={{ marginBottom: 20 }} />
-                                    </ColorPicker>
-
-                                    <TouchableOpacity
-                                        onPress={() => { setColorPickerShow(false) }}
-                                        style={{ width: 70, height: 40, backgroundColor: '#1988ff', justifyContent: 'center', alignItems: 'center', borderRadius: 20, }}>
-                                        <Text style={{ color: 'white' }}>OK</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </Modal>
+                        <CountDown
+                            until={date}
+                            color={color}
+                        />
+                        
                     </Animated.View>
 
-                    <Animated.View style={{ marginTop: 15, position: 'absolute', right: 6, height: 100, opacity: opacity, justifyContent: 'center', alignItems: 'center', width: Math.abs(OFFSET), zIndex: -1 }}>
+                    <Animated.View style={{ position: 'absolute', right: 6, height: 100, opacity: opacity, justifyContent: 'center', alignItems: 'center', width: Math.abs(OFFSET), zIndex: -1 }}>
                         <TouchableOpacity
                             onPress={handleDelete}
                         >
                             <FontAwesomeIcon icon={faTrashCan} color='red' size={40} />
                         </TouchableOpacity>
                     </Animated.View>
-                </View>
+                </TouchableOpacity>
 
             </GestureDetector>
         </GestureHandlerRootView>
     );
 };
-
-function calcTimeLeft(fromDate) {
-    var timeleft = fromDate.getTime() - new Date().getTime(); // in milliseconds
-
-    return timeleft / 1000;
-}
-
 
 const styles = StyleSheet.create({
     eventContainer: {
@@ -205,8 +124,11 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         elevation: 5,
         height: 100,
-        // borderWidth: 1
+        justifyContent: 'space-between',
         marginHorizontal: 15,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
     },
     button: {
         width: 25,
@@ -215,20 +137,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: 100,
-        marginHorizontal: 5,
-    },
-    settingsContainer: {
-        marginHorizontal: 5
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: 195
-    },
+    text: {
+        fontSize: 20,
+        color: 'white',
+        fontWeight: 'bold',
+        flexShrink: 1,
+        marginRight: 15,
+    }
 });
