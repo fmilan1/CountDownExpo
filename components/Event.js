@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faAngleDown, faPalette, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faPalette, faPen, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
 import Animated, { interpolate, runOnJS, runOnUI, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ColorPicker, { Panel1, Swatches, Preview, OpacitySlider, HueSlider, PreviewText } from 'reanimated-color-picker';
@@ -28,7 +28,8 @@ export default Event = ({color, onDelete, title, created, date}) => {
 
     const navigation = useNavigation();
 
-    const opacity = useSharedValue(0);
+    const trashOpacity = useSharedValue(0);
+    const penOpacity = useSharedValue(0);
     const swipeGesture = Gesture.Pan();
     const translateX = useSharedValue(0);
     const heightValue = useSharedValue(100);
@@ -47,18 +48,18 @@ export default Event = ({color, onDelete, title, created, date}) => {
 
     swipeGesture.onUpdate((e) => {
         translateX.value = startTranslationX + e.translationX;
-        opacity.value = interpolate(-translateX.value, [0, OFFSET], [0, 1])
+        trashOpacity.value = interpolate(-translateX.value, [0, OFFSET], [0, 1])
+        penOpacity.value = interpolate(translateX.value, [0, OFFSET], [0, 1])
     });
 
     swipeGesture.onEnd((e) => {
-        if (-translateX.value < OFFSET)
-            translateX.value = withSpring(0);
-        else
-            translateX.value = withSpring(-OFFSET)
+        if (translateX.value > OFFSET) translateX.value = withSpring(OFFSET);
+        else if (-translateX.value < OFFSET) translateX.value = withSpring(0);
+        else translateX.value = withSpring(-OFFSET);
 
-        if (-translateX.value > OFFSET * 3) {
-            handleDelete();
-        }
+        if (-translateX.value > OFFSET * 3)  handleDelete();
+        else if (translateX.value > OFFSET * 3)  handleEdit();
+        
     });
 
 
@@ -70,13 +71,19 @@ export default Event = ({color, onDelete, title, created, date}) => {
     }
 
     const handleDelete = () => {
-        opacity.value = 0;
+        trashOpacity.value = 0;
+        penOpacity.value = 0;
         heightValue.value = withTiming(0);
         margin.value = withTiming(0);
         translateX.value = withTiming(-SCREEN_WIDTH, { duration: 300 }, (finished) => {
             if (finished)
                 runOnJS(doDelete)();
         });
+    }
+
+    const handleEdit = () => {
+        navigation.navigate('New Event', {newEvent: 'edit', created: created, date: date, color: color, title: title});
+        translateX.value = withSpring(0);
     }
 
     React.useEffect(() => {
@@ -87,9 +94,14 @@ export default Event = ({color, onDelete, title, created, date}) => {
     return (
         <GestureHandlerRootView>
             <GestureDetector gesture={swipeGesture}>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('New Event', {newEvent: 'edit', created: created, date: date, color: color, title: title})}
-                >
+                <View>
+
+                    <Animated.View style={{ position: 'absolute', left: 6, height: 100, opacity: penOpacity, justifyContent: 'center', alignItems: 'center', width: Math.abs(OFFSET), zIndex: -1 }}>
+                        <TouchableOpacity
+                            onPress={handleEdit} >
+                            <FontAwesomeIcon icon={faPen} color='rgb(100, 255, 0)' size={40} />
+                        </TouchableOpacity>
+                    </Animated.View>
                     <Animated.View style={[styles.eventContainer, animatedStyle]}>
                         <View style={{width: 0, flex: 1, flexGrow: 1}}>
                             <Text style={styles.text}>
@@ -100,18 +112,18 @@ export default Event = ({color, onDelete, title, created, date}) => {
                         <CountDown
                             until={date}
                             color={color}
-                        />
+                            />
                         
                     </Animated.View>
 
-                    <Animated.View style={{ position: 'absolute', right: 6, height: 100, opacity: opacity, justifyContent: 'center', alignItems: 'center', width: Math.abs(OFFSET), zIndex: -1 }}>
+                    <Animated.View style={{ position: 'absolute', right: 6, height: 100, opacity: trashOpacity, justifyContent: 'center', alignItems: 'center', width: Math.abs(OFFSET), zIndex: -1 }}>
                         <TouchableOpacity
                             onPress={handleDelete}
                         >
                             <FontAwesomeIcon icon={faTrashCan} color='red' size={40} />
                         </TouchableOpacity>
                     </Animated.View>
-                </TouchableOpacity>
+                </View>
 
             </GestureDetector>
         </GestureHandlerRootView>

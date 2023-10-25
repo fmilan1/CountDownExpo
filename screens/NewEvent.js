@@ -32,6 +32,12 @@ const NewEvent = ({ navigation, route }) => {
     setLastColor(newColor.hex);
   }
 
+  React.useEffect(() => {
+    route.params.newEvent == 'edit' ? navigation.setOptions({
+      title: 'Edit Event'
+    }) : '';
+  }, [])
+
   return (
 
     <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>

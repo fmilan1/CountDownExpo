@@ -60,15 +60,10 @@ const HomeScreen = ({ navigation, route }) => {
         keyExtractor={(item, index) => (index)}
         
         ItemSeparatorComponent={() => <View style={{height: 15}} />}
+        style={{
+          paddingTop: 15,
+        }}
       />
-      
-      <TouchableOpacity style={{width: 50, height: 50, backgroundColor: 'white', elevation: 5, position: 'absolute', bottom: 20, right: 20, borderRadius: 25, justifyContent: 'center', alignItems: 'center'}} 
-        onPress={() => { 
-          navigation.navigate('New Event', {newEvent: null});
-          
-      }}>
-        <Text style={{fontSize: 30}}>+</Text>
-      </TouchableOpacity>
     </View>
   );
 };
