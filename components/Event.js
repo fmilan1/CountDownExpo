@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
     eventContainer: {
         borderRadius: 10,
         overflow: 'hidden',
-        elevation: 5,
         height: 100,
         justifyContent: 'space-between',
         marginHorizontal: 15,

@@ -66,12 +66,14 @@ const CountDown = ({until, color}) => {
 const styles = StyleSheet.create({
     cardcontainer: {
         flexDirection: 'row',
-        gap: 3
+        gap: 3,
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: .35,
     },
     card: {
         width: 35,
         height: 50,
-        elevation: 10,
+        elevation: 5,
         borderRadius: 7,
         overflow: 'hidden',
     },
