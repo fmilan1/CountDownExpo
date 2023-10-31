@@ -33,10 +33,6 @@ function App() {
   const Stack = createNativeStackNavigator();
   
   return (
-    // <View>
-    //   {/* <Text>kecske</Text> */}
-    //   <Event/>
-    // </View>
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -45,7 +41,7 @@ function App() {
           initialParams={{newEvent: null}}
           options={({navigation}) => ({
             headerRight: () => (
-              <TouchableOpacity style={{height: 35, aspectRatio: 1.5, backgroundColor: 'white', elevation: 5, borderRadius: 25, justifyContent: 'center', alignItems: 'center'}} 
+              <TouchableOpacity style={{height: 35, aspectRatio: 1.5, backgroundColor: 'white', elevation: 5, borderRadius: 25, justifyContent: 'center', alignItems: 'center', shadowOpacity: .15, shadowOffset: {height: 1}}} 
                 onPress={() => { 
                   navigation.navigate('New Event', {newEvent: null});
               
