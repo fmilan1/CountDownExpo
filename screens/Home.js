@@ -2,13 +2,14 @@ import * as React from 'react';
 import { useState } from 'react';
 import {
   StyleSheet,
-  View,
-  TouchableOpacity,
   Text,
+  View
 } from 'react-native';
 import Event from '../components/Event';
 import { FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist"
+import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
 
 
 const HomeScreen = ({ navigation, route }) => {
@@ -68,11 +69,22 @@ const HomeScreen = ({ navigation, route }) => {
   })
 
 
+  const [data, setData] = useState([1, 2, 3, 4, 5, 6, 7]);
 
-
+  const renderItem = ({ drag, item, isActive, asd, kascasd, a }) => {
+    return (
+      <TouchableOpacity
+        onLongPress={drag}
+        style={{ height: 50, aspectRatio: 5, backgroundColor: 'tomato', marginBottom: 2 }}
+      >
+        <Text>{item.title}</Text>
+      </TouchableOpacity>
+    )
+  }
 
   return (
-    <View style={[styles.container, {alignItems: eventList.length === 0 ? 'center' : ''}]}>
+
+    <View style={[styles.container, eventList.length === 0 ? { alignItems: 'center', justifyContent: 'center' } : {}]}>
       {
         eventList.length === 0 &&
         <Text
@@ -81,20 +93,20 @@ const HomeScreen = ({ navigation, route }) => {
       }
       {
         eventList.length > 0 &&
-        <FlatList
-          data={eventList}
-          renderItem={({ item }) =>
-
-            <Event onDelete={handleDelete} key={item.created} created={item.created} color={item.color} title={item.title} date={item.date} />
-
-          }
-          keyExtractor={(item, index) => (index)}
-
-          ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
-          style={{
-            paddingTop: 15,
-          }}
-        />}
+        <GestureHandlerRootView>
+          <DraggableFlatList
+            ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
+            renderPlaceholder={() => <View style={{ backgroundColor: 'tomato' }} />}
+            data={eventList}
+            keyExtractor={(item) => item.created}
+            renderItem={({ item, drag, isActive }) =>
+              <Event onDelete={handleDelete} drag={drag} key={item.created} isActive={isActive} created={item.created} color={item.color} title={item.title} date={item.date} />
+            }
+            onDragEnd={({ data }) => setEventList(data)}
+            activationDistance={10}
+          />
+        </GestureHandlerRootView>
+      }
     </View>
   );
 };
@@ -104,6 +116,5 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
   },
 });
